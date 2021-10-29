@@ -1,0 +1,21 @@
+``` Splunk 7.3.1, events index. Create from_pop to_pop traffic matrix
+
+index = netflow flow_dir::0
+| eval temp=split(router_name, "-") 
+| eval from_pop_name = upper(mvindex(temp, 0)) 
+| eval temp=split(bgp_next_hop_router_name, "-") 
+| eval to_pop_name = upper(mvindex(temp, 0))
+| eval speed = ((bytes*8*$sampling_rate$)/$time_interval$) | eval speed = round(speed,1)
+| chart useother=false limit=1000 max(speed) AS speed BY from_pop_name, to_pop_name
+
+``` Splunk 7.3.1, events index. Create traffic rate time series chart per device.
+    Limit number of data points to 5000 highest values.
+
+index=netflow flow_dir::0 router_name=$device_name$
+| timechart span=60s sum(bytes) AS bytes
+| eval traffic_rate = (bytes*8*$sampling_rate$)/($time_interval$)
+| fields _time, traffic_rate_in
+| sort - traffic_rate
+| head 5000
+| sort _time
+
