@@ -42,3 +42,11 @@ index = netflow flow_dir::0 router_name=$device_name$
     | fillnull value=NULL 
     | search ip_2 = "NULL"
     | table name, ip_1, ip_2
+
+``` Splunk 7.3.1, events index. Find records which are in both files by using lookup instead of join.
+    (Splunk recommended approach)
+
+    | inputlookup file1.csv 
+    | fields hostname, ip_1
+    | lookup file2.csv hostname OUTPUT ip_2
+    | table name, ip_1, ip_2
