@@ -31,3 +31,14 @@ index = netflow flow_dir::0 router_name=$device_name$
 | stats sum(bytes) as bytes by src_ip-dest_ip
 | sort - bytes 
 | head 20
+
+``` Splunk 7.3.1, events index. Find records which are in file1 but not in file2
+
+| inputlookup file1.csv 
+| fields hostname, ip_1
+| join type=left hostname
+    [| inputlookup file2.csv 
+    | fields hostname, ip_2 
+    | fillnull value=NULL 
+    | search ip_2 = "NULL"
+    | table name, ip_1, ip_2
