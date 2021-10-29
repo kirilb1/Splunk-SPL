@@ -19,3 +19,15 @@ index=netflow flow_dir::0 router_name=$device_name$
 | head 5000
 | sort _time
 
+``` Splunk 7.3.1, metrics index. Create top talkers report.
+
+| mstats sum(bytes) as bytes WHERE index=netflow BY src_ip
+| sort - bytes limit=20
+
+``` Splunk 7.3.1, events index. Create top conversations report.
+
+index = netflow flow_dir::0 router_name=$device_name$ 
+| eval src_ip-dest_ip=src_ip. "-" .dest_ip 
+| stats sum(bytes) as bytes by src_ip-dest_ip
+| sort - bytes 
+| head 20
